@@ -42,6 +42,7 @@ public class BurgerPriceParameterizedTest {
         };
     }
 
+    /// Проверка расчета цены бургера
     @Test
     public void checkBurgerPrice () {
         // мок для базы данных

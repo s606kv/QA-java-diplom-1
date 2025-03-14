@@ -1,13 +1,13 @@
-import jdk.jfr.Description;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.MockitoJUnitRunner;
 import praktikum.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.*;
 import static praktikum.IngredientType.SAUCE;
@@ -15,68 +15,56 @@ import static praktikum.IngredientType.SAUCE;
 @RunWith(MockitoJUnitRunner.class)
 public class BurgerTest {
 
-    Bun bun = new Bun("Булка для теста", 1000);
-    List<Ingredient> ingredients;
-    int listSize;
+    private List<Ingredient> ingredientsList;
+    private int listSize;
+    private Burger burger;
+    private SoftAssertions softly;
 
     @Mock
-    Database database;
-    @Spy
-    Burger burger;
+    Bun bun;
 
     @Before
     public void setUp () {
-        // создали фиктивную базу данных ингредиентов
-        Mockito.when(database.availableIngredients())
-                .thenReturn(List.of(new Ingredient(SAUCE, "One", 100),
-                        new Ingredient(SAUCE, "Two", 200),
-                        new Ingredient(SAUCE, "Three", 300)));
-        List<Ingredient> dbIngredients = database.availableIngredients();
-
-        // создали список ингредиентов
-        ingredients = burger.ingredients;
+        ingredientsList = new ArrayList<>();
+        burger = new Burger();
 
         // добавили ингредиенты
-        ingredients.add(dbIngredients.get(0));
-        ingredients.add(dbIngredients.get(1));
-        ingredients.add(dbIngredients.get(2));
+        ingredientsList.add(new Ingredient(SAUCE, "One", 100));
+        ingredientsList.add(new Ingredient(SAUCE, "Two", 200));
+        ingredientsList.add(new Ingredient(SAUCE, "Three", 300));
 
-        // получили начальный размер списка
-        listSize = ingredients.size();
+        // инициализировали переменную ingredients класса burger
+        burger.ingredients=ingredientsList;
 
-        // вывели инфу на экран
+        // получили начальный размер списка и вывели инфу
+        listSize = ingredientsList.size();
         System.out.println(String.format("До выполнения теста, в списке элементов: %d.", listSize));
-        System.out.println("Начальный список ингредиентов:\n" + ingredients);
+        System.out.println("Начальный список ингредиентов:\n" + ingredientsList);
     }
 
+    /// Проверка метода задания булки
     @Test
-    @Description("Проверка метода задания булки")
     public void setBunTest () {
         // вызвали метод с новой булкой
         burger.setBuns(bun);
-        // убедились, что метод был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1)).setBuns(bun);
 
-        assertNotNull(bun);
+        assertEquals(bun, burger.bun);
     }
 
+    /// Проверка возможности добавления ингредиентов
     @Test
-    @Description("Проверка возможности добавления ингредиентов")
     public void possibleToAddIngredientTest () {
-
         // создали новый ингредиент
         Ingredient someNewIngredient = new Ingredient(SAUCE, "Test", 1);
 
         // вызвали метод добавления и передали в него новый ингредиент
         burger.addIngredient(someNewIngredient);
-        // убелились, что метод был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1)).addIngredient(someNewIngredient);
 
         // вывели новый список на экран
-        System.out.println("Список после выполнения метода:\n" + ingredients);
+        System.out.println("Список после выполнения метода:\n" + ingredientsList);
 
-        // вывели предупреждение на экран
-        int newListSize = ingredients.size(); // получили новый размер листа после добавления
+        // получили новый размер листа после добавления и вывели информацию
+        int newListSize = ingredientsList.size();
         if (newListSize==listSize+1) {
         System.out.println(String.format("После добавления в списке элементов: %d.", newListSize));
         } else {
@@ -85,23 +73,19 @@ public class BurgerTest {
 
         // сравнили размеры, убедились, что список пополнился
         assertTrue(newListSize==listSize+1);
-
     }
 
+    /// Проверка возможности удаления ингредиента по его индексу
     @Test
-    @Description("Проверка возможности удаления ингредиента по его индексу")
     public void possibleToRemoveIngredientTest () {
-
         // вызвали метод удаления и передали в него индекс
         burger.removeIngredient(0);
-        // убелились, что метод был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1)).removeIngredient(0);
 
         // вывели новый список на экран
-        System.out.println("Список после выполнения метода:\n" + ingredients);
+        System.out.println("Список после выполнения метода:\n" + ingredientsList);
 
         // вывели предупреждение на экран
-        int newListSize = ingredients.size(); // получили новый размер листа после удаления
+        int newListSize = ingredientsList.size(); // получили новый размер листа после удаления
         if (newListSize==listSize-1) {
             System.out.println(String.format("После удаления в списке элементов: %d.", newListSize));
         } else {
@@ -112,57 +96,51 @@ public class BurgerTest {
         assertTrue(newListSize==listSize-1);
     }
 
+    /// Проверка возможности перемещения слоёв по их индексам
     @Test
-    @Description("Проверка возможности перемещения слоёв по их индексам")
     public void possibleToMoveIngredientTest () {
-
         // поставили последний элемент на первое место
-        burger.moveIngredient(ingredients.size()-1, 0);
-        // убелились, что метод был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1))
-                .moveIngredient(ingredients.size()-1, 0);
+        burger.moveIngredient(ingredientsList.size()-1, 0);
 
         // вывели новый список на экран
-        System.out.println("Список после выполнения метода:\n" + ingredients);
+        System.out.println("Список после выполнения метода:\n" + ingredientsList);
 
         // вывели предупреждение на экран
-        int newListSize = ingredients.size(); // получили новый размер листа после удаления
+        int newListSize = ingredientsList.size(); // получили новый размер листа после удаления
         if (newListSize==listSize) {
             System.out.println("Размер списка не поменялся.");
         } else {
             System.out.println(String.format("⚠\uFE0FОшибка. Размер списка изменился.%n В списке было элементов: %s, а стало элементов: %s.", listSize, newListSize));
         }
 
+        softly = new SoftAssertions();
         // проверили размер списка
-        assertEquals(listSize, newListSize);
+        softly.assertThat(newListSize).isEqualTo(listSize);
         // проверили, что на первое место переместился элемент с именем
-        assertEquals("Three", ingredients.get(0).getName());
+        softly.assertThat(ingredientsList.get(0).getName()).isEqualTo("Three");
+        softly.assertAll();
     }
 
+    /// Проверка возможности напечатать корректный чек
     @Test
-    @Description("Проверка возможности напечатать чек")
     public void getReceiptTest () {
-        // переопределили булку
-        burger.bun = this.bun;
+        burger.bun = bun;
 
-        // задали ожидаемую форму вывода чека
-        String expectedReceipt =
-                String.format("(==== %s ====)%n", bun.getName()) +
-                        String.format("= %s %s =%n", ingredients.get(0).getType().toString().toLowerCase(), ingredients.get(0).getName()) +
-                        String.format("= %s %s =%n", ingredients.get(1).getType().toString().toLowerCase(), ingredients.get(1).getName()) +
-                        String.format("= %s %s =%n", ingredients.get(2).getType().toString().toLowerCase(), ingredients.get(2).getName()) +
-                        String.format("(==== %s ====)%n%n", bun.getName()) +
-                        String.format("Price: %f%n", burger.getPrice());
-        // вывели ожидаемый чек на экран
+        // задали параметры булке-моку
+        Mockito.when(bun.getName()).thenReturn("TestBun");
+        Mockito.when(bun.getPrice()).thenReturn(10f);
+
+        // задали ожидаемую форму вывода чека и вывели чек на экран
+        String expectedReceipt = String.format("(==== TestBun ====)%n") +
+                String.format("= %s %s =%n", ingredientsList.get(0).getType().toString().toLowerCase(), ingredientsList.get(0).getName()) +
+                String.format("= %s %s =%n", ingredientsList.get(1).getType().toString().toLowerCase(), ingredientsList.get(1).getName()) +
+                String.format("= %s %s =%n", ingredientsList.get(2).getType().toString().toLowerCase(), ingredientsList.get(2).getName()) +
+                String.format("(==== TestBun ====)%n%n") +
+                String.format("Price: 620,000000%n");
         System.out.println("Ожидаемый чек:\n" + expectedReceipt);
 
-        // вызвали метод формирования чека
+        // вызвали метод формирования чека и вывели чек на экран
         String actualReceipt = burger.getReceipt();
-        // убедились, что был вызван метод getPrice() 2 раза
-        Mockito.verify(burger, Mockito.times(2)).getPrice();
-        // убедились, что метод getReceipt() был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1)).getReceipt();
-        // вывели на экран фактический чек
         System.out.println("Фактический чек:\n" + actualReceipt);
 
         // сравнили результаты
