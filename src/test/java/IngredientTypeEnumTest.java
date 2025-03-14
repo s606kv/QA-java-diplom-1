@@ -1,6 +1,8 @@
 import org.junit.Test;
 import praktikum.IngredientType;
 
+import org.assertj.core.api.SoftAssertions;
+
 import static org.junit.Assert.assertEquals;
 
 public class IngredientTypeEnumTest {
@@ -11,7 +13,13 @@ public class IngredientTypeEnumTest {
 
     @Test
     public void ingredientTypeEnumValuesTest () {
-        assertEquals(IngredientType.SAUCE, IngredientType.valueOf("SAUCE"));
-        assertEquals(IngredientType.FILLING, IngredientType.valueOf("FILLING"));
+        SoftAssertions softly = new SoftAssertions();
+        softly.assertThat(IngredientType.SAUCE)
+                .as("Проверка элемента SAUCE")
+                .isEqualTo(IngredientType.valueOf("SAUCE"));
+        softly.assertThat(IngredientType.FILLING)
+                .as("Проверка элемента FILLING")
+                .isEqualTo(IngredientType.valueOf("FILLING"));
+        softly.assertAll();
     }
 }
