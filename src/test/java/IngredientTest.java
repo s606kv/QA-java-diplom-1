@@ -13,20 +13,13 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static praktikum.IngredientType.SAUCE;
 
-@RunWith(MockitoJUnitRunner.class)
 public class IngredientTest {
 
-    Ingredient ingredient;
-
-    @Mock
-    Database mockedDatabase;
+    private Ingredient ingredient;
 
     @Before
     public void setUp () {
-        Mockito.when(mockedDatabase.availableIngredients()).thenReturn(List.of(new Ingredient(SAUCE, "TestName", 1000)));
-        List<Ingredient> ingredients = mockedDatabase.availableIngredients();
-        Mockito.verify(mockedDatabase, Mockito.times(1)).availableIngredients();
-        ingredient = ingredients.get(0);
+        ingredient = new Ingredient(SAUCE, "TestName", 1000);
     }
 
     @Test
