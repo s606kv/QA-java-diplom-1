@@ -29,13 +29,11 @@ public class BunTest {
     }
 
     @Test
-    @Description("Проверка метода получения названия")
     public void getNameTest () {
         assertEquals("⚠\uFE0FОшибка. Названия не совпадают.", "TestBunName", bun.getName());
     }
 
     @Test
-    @Description("Проверка метода получения цены")
     public void getPriceTest() {
         assertEquals("⚠\uFE0FОшибка. Цены не совпадают.",1000, bun.getPrice(), 0);
     }
