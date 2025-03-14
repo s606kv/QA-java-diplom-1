@@ -4,19 +4,18 @@ import org.junit.runners.Parameterized;
 import org.mockito.Mockito;
 import praktikum.Bun;
 import praktikum.Burger;
-import praktikum.Database;
 import praktikum.Ingredient;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static praktikum.IngredientType.SAUCE;
 
 @RunWith(Parameterized.class)
 public class BurgerPriceParameterizedTest {
 
+    private List<Ingredient> ingredientsList;
+    private Burger burger;
     private final float bunPrice;
     private float firstIngredientPrice;
     private float secondIngredientPrice;
@@ -45,43 +44,42 @@ public class BurgerPriceParameterizedTest {
     /// Проверка расчета цены бургера
     @Test
     public void checkBurgerPrice () {
-        // мок для базы данных
-        Database database = mock(Database.class);
-        // фиктивный список ингредиентов из базы данных
-        Mockito.when(database.availableIngredients())
-                .thenReturn(List.of(new Ingredient(SAUCE, "One", ingredientPrices[0]),
-                        new Ingredient(SAUCE, "Two", ingredientPrices[1]),
-                        new Ingredient(SAUCE, "Three", ingredientPrices[2])));
-        List<Ingredient> dbIngredients = database.availableIngredients();
+        burger = new Burger();
 
-        // шпион бургера
-        Burger burger = spy(Burger.class);
-        // создали список ингредиентов
-        List<Ingredient> ingredients = burger.ingredients;
-        // и добавили в него ингредиенты
-        ingredients.add(dbIngredients.get(0));
-        ingredients.add(dbIngredients.get(1));
-        ingredients.add(dbIngredients.get(2));
+        // создали моки
+        Bun bun = mock(Bun.class);
+        Ingredient ingredient1 = mock(Ingredient.class);
+        Ingredient ingredient2 = mock(Ingredient.class);
+        Ingredient ingredient3 = mock(Ingredient.class);
 
-        // вывели список ингредиентов на экран
-        System.out.println("Список ингредиентов:\n" + ingredients);
+        // задали значения
+        Mockito.when(ingredient1.getName()).thenReturn("First");
+        Mockito.when(ingredient1.getPrice()).thenReturn(ingredientPrices[0]);
 
-        Bun bun = new Bun("Булка для теста", bunPrice);
+        Mockito.when(ingredient2.getName()).thenReturn("Second");
+        Mockito.when(ingredient2.getPrice()).thenReturn(ingredientPrices[1]);
+
+        Mockito.when(ingredient3.getName()).thenReturn("Third");
+        Mockito.when(ingredient3.getPrice()).thenReturn(ingredientPrices[2]);
+
+        ingredientsList = List.of(ingredient1, ingredient2, ingredient3);
+        burger.ingredients = ingredientsList;
         burger.bun = bun;
 
-        // вызвали метод расчета
-        float burgerPrice = burger.getPrice();
-        // и убедились, что метод был вызван 1 раз
-        Mockito.verify(burger, Mockito.times(1)).getPrice();
+        // переопределили метод получения цены булки
+        Mockito.when(bun.getPrice()).thenReturn(bunPrice);
+
+        /// Вызвали тестируемый метод расчета
+        float actualBurgerPrice = burger.getPrice();
 
         // вывели информацию о стоимости булок, каждого ингредиента и общую стоимость
-        for(Ingredient ingredient : ingredients) {
+        for(Ingredient ingredient : ingredientsList) {
             System.out.println(String.format("Стоимость ингредиента %s равна %f", ingredient.getName(), ingredient.getPrice()));
         }
         System.out.println(String.format("Стоимость двух булок составит: %f.", bun.getPrice()*2));
-        System.out.println(String.format("Общая стоимость бургера составляет: %f.", burgerPrice));
+        System.out.println(String.format("Общая стоимость бургера составляет: %f.", actualBurgerPrice));
 
-        // проверили общую стоимость
-        assertEquals("⚠\uFE0FОшибка. Стоимость не соответствует ожидаемой.", expectedPrice, burgerPrice,0);
+        /// Проверили общую стоимость
+        assertEquals("⚠\uFE0FОшибка. Стоимость не соответствует ожидаемой.", expectedPrice, actualBurgerPrice,0);
     }
 }

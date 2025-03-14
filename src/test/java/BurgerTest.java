@@ -10,6 +10,8 @@ import praktikum.*;
 import java.util.ArrayList;
 import java.util.List;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
+import static praktikum.IngredientType.FILLING;
 import static praktikum.IngredientType.SAUCE;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -18,7 +20,7 @@ public class BurgerTest {
     private List<Ingredient> ingredientsList;
     private int listSize;
     private Burger burger;
-    private SoftAssertions softly;
+    private SoftAssertions soft;
 
     @Mock
     Bun bun;
@@ -28,10 +30,28 @@ public class BurgerTest {
         ingredientsList = new ArrayList<>();
         burger = new Burger();
 
+        // создали моки для ингредиентов
+        Ingredient ingredient1 = mock(Ingredient.class);
+        Ingredient ingredient2 = mock(Ingredient.class);
+        Ingredient ingredient3 = mock(Ingredient.class);
+
+        // задали значения
+        Mockito.when(ingredient1.getType()).thenReturn(SAUCE);
+        Mockito.when(ingredient1.getName()).thenReturn("One");
+        Mockito.when(ingredient1.getPrice()).thenReturn(100f);
+
+        Mockito.when(ingredient2.getType()).thenReturn(SAUCE);
+        Mockito.when(ingredient2.getName()).thenReturn("Two");
+        Mockito.when(ingredient2.getPrice()).thenReturn(200f);
+
+        Mockito.when(ingredient3.getType()).thenReturn(FILLING);
+        Mockito.when(ingredient3.getName()).thenReturn("Three");
+        Mockito.when(ingredient3.getPrice()).thenReturn(300f);
+
         // добавили ингредиенты
-        ingredientsList.add(new Ingredient(SAUCE, "One", 100));
-        ingredientsList.add(new Ingredient(SAUCE, "Two", 200));
-        ingredientsList.add(new Ingredient(SAUCE, "Three", 300));
+        ingredientsList.add(ingredient1);
+        ingredientsList.add(ingredient2);
+        ingredientsList.add(ingredient3);
 
         // инициализировали переменную ingredients класса burger
         burger.ingredients=ingredientsList;
@@ -48,6 +68,7 @@ public class BurgerTest {
         // вызвали метод с новой булкой
         burger.setBuns(bun);
 
+        /// Сравнили результаты
         assertEquals(bun, burger.bun);
     }
 
@@ -71,7 +92,7 @@ public class BurgerTest {
             System.out.println("⚠\uFE0FОшибка. Список не изменился.");
         }
 
-        // сравнили размеры, убедились, что список пополнился
+        /// Сравнили размеры, убедились, что список пополнился
         assertTrue(newListSize==listSize+1);
     }
 
@@ -92,7 +113,7 @@ public class BurgerTest {
             System.out.println("⚠\uFE0FОшибка. Список не изменился.");
         }
 
-        // сравнили размеры, убедились, что список сократился
+        /// Сравнили размеры, убедились, что список сократился
         assertTrue(newListSize==listSize-1);
     }
 
@@ -113,12 +134,13 @@ public class BurgerTest {
             System.out.println(String.format("⚠\uFE0FОшибка. Размер списка изменился.%n В списке было элементов: %s, а стало элементов: %s.", listSize, newListSize));
         }
 
-        softly = new SoftAssertions();
+        /// Проверки
+        soft = new SoftAssertions();
         // проверили размер списка
-        softly.assertThat(newListSize).isEqualTo(listSize);
+        soft.assertThat(newListSize).isEqualTo(listSize);
         // проверили, что на первое место переместился элемент с именем
-        softly.assertThat(ingredientsList.get(0).getName()).isEqualTo("Three");
-        softly.assertAll();
+        soft.assertThat(ingredientsList.get(0).getName()).isEqualTo("Three");
+        soft.assertAll();
     }
 
     /// Проверка возможности напечатать корректный чек
@@ -126,24 +148,24 @@ public class BurgerTest {
     public void getReceiptTest () {
         burger.bun = bun;
 
-        // задали параметры булке-моку
-        Mockito.when(bun.getName()).thenReturn("TestBun");
-        Mockito.when(bun.getPrice()).thenReturn(10f);
-
         // задали ожидаемую форму вывода чека и вывели чек на экран
         String expectedReceipt = String.format("(==== TestBun ====)%n") +
-                String.format("= %s %s =%n", ingredientsList.get(0).getType().toString().toLowerCase(), ingredientsList.get(0).getName()) +
-                String.format("= %s %s =%n", ingredientsList.get(1).getType().toString().toLowerCase(), ingredientsList.get(1).getName()) +
-                String.format("= %s %s =%n", ingredientsList.get(2).getType().toString().toLowerCase(), ingredientsList.get(2).getName()) +
+                String.format("= sauce One =%n") +
+                String.format("= sauce Two =%n") +
+                String.format("= filling Three =%n") +
                 String.format("(==== TestBun ====)%n%n") +
                 String.format("Price: 620,000000%n");
         System.out.println("Ожидаемый чек:\n" + expectedReceipt);
 
-        // вызвали метод формирования чека и вывели чек на экран
+        // переопределили методы моков для булок
+        Mockito.when(bun.getName()).thenReturn("TestBun");
+        Mockito.when(bun.getPrice()).thenReturn(10f);
+
+        // вызвали метод формирования фактического чека и вывели чек на экран
         String actualReceipt = burger.getReceipt();
         System.out.println("Фактический чек:\n" + actualReceipt);
 
-        // сравнили результаты
+        /// Сравнили результаты
         assertEquals(expectedReceipt, actualReceipt);
     }
 }
