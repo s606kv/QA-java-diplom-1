@@ -24,16 +24,17 @@ public class BurgerTest {
 
     @Mock
     Bun bun;
+    @Mock
+    Ingredient ingredient1;
+    @Mock
+    Ingredient ingredient2;
+    @Mock
+    Ingredient ingredient3;
 
     @Before
     public void setUp () {
         ingredientsList = new ArrayList<>();
         burger = new Burger();
-
-        // создали моки для ингредиентов
-        Ingredient ingredient1 = mock(Ingredient.class);
-        Ingredient ingredient2 = mock(Ingredient.class);
-        Ingredient ingredient3 = mock(Ingredient.class);
 
         // задали значения
         Mockito.when(ingredient1.getType()).thenReturn(SAUCE);
@@ -75,11 +76,8 @@ public class BurgerTest {
     /// Проверка возможности добавления ингредиентов
     @Test
     public void possibleToAddIngredientTest () {
-        // создали новый ингредиент
-        Ingredient someNewIngredient = new Ingredient(SAUCE, "Test", 1);
-
-        // вызвали метод добавления и передали в него новый ингредиент
-        burger.addIngredient(someNewIngredient);
+        // вызвали метод добавления
+        burger.addIngredient(ingredient1);
 
         // вывели новый список на экран
         System.out.println("Список после выполнения метода:\n" + ingredientsList);
